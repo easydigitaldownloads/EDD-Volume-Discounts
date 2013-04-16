@@ -134,7 +134,7 @@ class EDD_Volume_Discounts {
 	 *
 	 * @since 1.0
 	 *
-	 * @access private
+	 * @access public
 	 * @return void
 	 */
 	public static function textdomain() {
@@ -149,6 +149,14 @@ class EDD_Volume_Discounts {
 	}
 
 
+	/**
+	 * register the post type
+	 *
+	 * @since 1.0
+	 *
+	 * @access public
+	 * @return void
+	 */
 	public function register_post_type() {
 
 		/** Payment Post Type */
@@ -190,7 +198,7 @@ class EDD_Volume_Discounts {
 	 *
 	 * @since 1.0
 	 *
-	 * @access private
+	 * @access public
 	 * @return void
 	 */
 	public function apply_discounts() {

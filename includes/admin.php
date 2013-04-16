@@ -28,6 +28,7 @@ class EDD_Volume_Discounts_Admin {
 		add_action( 'admin_menu',       array( $this, 'metaboxes'            ) );
 		add_action( 'save_post',        array( $this, 'save_meta_box'        ) );
 		add_filter( 'enter_title_here', array( $this, 'change_default_title' ) );
+		add_filter( 'post_updated_messages', array( $this, 'updated_messages' ) );
 		add_filter( 'manage_edit-edd_volume_discount_columns', array( $this, 'columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'render_columns' ), 10, 2 );
 
@@ -195,6 +196,30 @@ class EDD_Volume_Discounts_Admin {
 		}
 
 		return $title;
+	}
+
+
+	/**
+	 * Updated Messages
+	 *
+	 * Returns an array of with all updated messages.
+	 *
+	 * @since 1.0
+	 * @param array $messages Post updated message
+	 * @return array $messages New post updated messages
+	 */
+	public function updated_messages( $messages ) {
+		global $post, $post_ID;
+
+		$messages['edd_volume_discount'] = array(
+			1 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
+			4 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
+			6 => __( 'Volume Discount published.', 'edd-volume-discount' ),
+			7 => __( 'Volume Discount saved.', 'edd-volume-discount' ),
+			8 => __( 'Volume Discount submitted.', 'edd-volume-discount' )
+		);
+
+		return $messages;
 	}
 
 
