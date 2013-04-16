@@ -2,7 +2,7 @@
 /*
 Plugin Name: Easy Digital Downloads - Volume Discounts
 Plugin URI: http://easydigitaldownloads.com/extension/volume-discounts
-Description: Provides the ability to charge simple shipping fees for physical products in EDD
+Description: Provides the ability to create automatically applied discounts based on cart volume
 Version: 1.0
 Author: Pippin Williamson
 Author URI:  http://pippinsplugins.com
@@ -13,7 +13,6 @@ class EDD_Volume_Discounts {
 
 	private static $instance;
 
-	private static $has_discounts = false;
 
 	/**
 	 * Get active object instance
