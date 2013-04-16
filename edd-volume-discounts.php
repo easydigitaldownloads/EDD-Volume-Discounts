@@ -177,7 +177,7 @@ class EDD_Volume_Discounts {
 
 		$args = array(
 			'labels' 			=> apply_filters( 'edd_volume_discounts_labels', $labels ),
-			'public' 			=> true,
+			'public' 			=> false,
 			'show_ui' 			=> true,
 			'show_in_menu'      => 'edit.php?post_type=download',
 			'query_var' 		=> false,
@@ -185,7 +185,7 @@ class EDD_Volume_Discounts {
 			'capability_type' 	=> 'shop_discount',
 			'map_meta_cap'      => true,
 			'supports' 			=> array( 'title' ),
-			'can_export'		=> true
+			'can_export'		=> false
 		);
 
 		register_post_type( 'edd_volume_discount', $args );
