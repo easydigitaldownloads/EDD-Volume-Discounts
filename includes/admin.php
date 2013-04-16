@@ -50,6 +50,8 @@ class EDD_Volume_Discounts_Admin {
 
 		// Plugin compatibility with Restrict Content Pro
 		remove_meta_box( 'rcp_meta_box', 'edd_volume_discount', 'normal' );
+		// Plugin compatibility with WordPress SEO
+		remove_meta_box( 'wpseo_meta', 'edd_volume_discount', 'normal' );
 	}
 
 
