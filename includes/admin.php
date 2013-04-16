@@ -34,18 +34,33 @@ class EDD_Volume_Discounts_Admin {
 	}
 
 
+	/**
+	 * Add / remove meta boxes
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
 	public function metaboxes() {
 
 		add_meta_box( 'edd_voume_discount_metabox_save', __( 'Save Volume Discount', 'edd-volume-discounts' ),  array( __CLASS__, 'render_save_metabox' ), 'edd_volume_discount', 'side', 'core' );
 		add_meta_box( 'edd_voume_discount_metabox_options', __( 'Discount Options', 'edd-volume-discounts' ),  array( __CLASS__, 'render_options_metabox' ), 'edd_volume_discount', 'normal', 'high' );
 
-		// Plugin compatibility with Restrict Content Pro
-		remove_meta_box( 'rcp_meta_box', 'edd_volume_discount', 'normal' );
 		remove_meta_box( 'submitdiv', 'edd_volume_discount', 'core' );
 		remove_meta_box( 'slugdiv', 'edd_volume_discount', 'core' );
 
+		// Plugin compatibility with Restrict Content Pro
+		remove_meta_box( 'rcp_meta_box', 'edd_volume_discount', 'normal' );
 	}
 
+
+	/**
+	 * Add inline CSS to the top of the edit / new screen for Volume Discounts
+	 *
+	 * This is to hide the Permalink section
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
 	public function css() {
 		global $post, $pagenow;
 
@@ -57,6 +72,13 @@ class EDD_Volume_Discounts_Admin {
 		echo '<style>#edit-slug-box{display:none;}</style>';
 	}
 
+
+	/**
+	 * Render the Save meta box
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
 	public function render_save_metabox() {
 		global $post;
 ?>
@@ -69,6 +91,12 @@ class EDD_Volume_Discounts_Admin {
 	}
 
 
+	/**
+	 * Render the options meta box
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
 	public function render_options_metabox() {
 		global $post;
 
@@ -150,6 +178,12 @@ class EDD_Volume_Discounts_Admin {
 	}
 
 
+	/**
+	 *  Change the "Enter title here" text
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
 	public function change_default_title( $title ) {
 
 		$screen = get_current_screen();
@@ -161,6 +195,14 @@ class EDD_Volume_Discounts_Admin {
 		return $title;
 	}
 
+
+	/**
+	 * Register list table columns
+	 *
+	 * @since 1.0
+	 * @param $columns array An array of existing columns
+	 * @return array
+	 */
 	public function columns( $columns ) {
 		$columns['number'] = __( 'Number of Products Required', 'edd-volume-discounts' );
 		$columns['amount'] = __( 'Discount Amount', 'edd-volume-discounts' );
@@ -168,6 +210,15 @@ class EDD_Volume_Discounts_Admin {
 		return $columns;
 	}
 
+
+	/**
+	 *  render the custom column content
+	 *
+	 * @since 1.0
+	 * @param $column_name string The name of the column being rendered
+	 * @param $post_id int The post ID a column is being rendered for
+	 * @return void
+	 */
 	public function render_columns( $column_name, $post_id ) {
 		if ( 'edd_volume_discount' !== get_post_type( $post_id ) )
 			return;
