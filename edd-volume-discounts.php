@@ -322,3 +322,31 @@ function edd_volume_discounts_load() {
 	$discounts = new EDD_Volume_Discounts();
 }
 add_action( 'plugins_loaded', 'edd_volume_discounts_load' );
+
+
+
+/**
+ * Registers the new license field type
+ *
+ * @access      private
+ * @since       10
+ * @return      void
+*/
+
+if( ! function_exists( 'edd_license_key_callback' ) ) {
+	function edd_license_key_callback( $args ) {
+		global $edd_options;
+
+		if( isset( $edd_options[ $args['id'] ] ) ) { $value = $edd_options[ $args['id'] ]; } else { $value = isset( $args['std'] ) ? $args['std'] : ''; }
+		$size = isset( $args['size'] ) && !is_null($args['size']) ? $args['size'] : 'regular';
+		$html = '<input type="text" class="' . $args['size'] . '-text" id="edd_settings_' . $args['section'] . '[' . $args['id'] . ']" name="edd_settings_' . $args['section'] . '[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"/>';
+
+		if( 'valid' == get_option( $args['options']['is_valid_license_option'] ) ) {
+			$html .= wp_nonce_field( $args['id'] . '_nonce', $args['id'] . '_nonce', false );
+			$html .= '<input type="submit" class="button-secondary" name="' . $args['id'] . '_deactivate" value="' . __( 'Deactivate License',  'edd-recurring' ) . '"/>';
+		}
+		$html .= '<label for="edd_settings_' . $args['section'] . '[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+
+		echo $html;
+	}
+}
