@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - Volume Discounts
 Plugin URI: http://easydigitaldownloads.com/extension/volume-discounts
 Description: Provides the ability to create automatically applied discounts based on cart volume
-Version: 1.0.1
+Version: 1.0.2
 Author: Pippin Williamson
 Author URI:  http://pippinsplugins.com
 Contributors: mordauk
@@ -43,7 +43,7 @@ class EDD_Volume_Discounts {
 
 		define( 'EDD_VOLUME_DISCOUNTS_STORE_API_URL', 'https://easydigitaldownloads.com' );
 		define( 'EDD_VOLUME_DISCOUNTS_PRODUCT_NAME', 'Volume Discounts' );
-		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.0.1' );
+		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.0.2' );
 
 		if( !class_exists( 'EDD_SL_Plugin_Updater' ) ) {
 			// load our custom updater
@@ -216,17 +216,21 @@ class EDD_Volume_Discounts {
 			'fields'         => 'ids'
 		) );
 
-		foreach( $discounts as $discount ) {
+		if( $discounts ) {
+			foreach( $discounts as $discount ) {
 
-			$number  = get_post_meta( $discount, '_edd_volume_discount_number', true );
-			if( $number > $cart_count ) {
-				EDD()->fees->remove_fee( 'volume_discount' );
-				return;
+				$number  = get_post_meta( $discount, '_edd_volume_discount_number', true );
+				if( $number > $cart_count ) {
+					EDD()->fees->remove_fee( 'volume_discount' );
+					return;
+				}
+
+				$percent = get_post_meta( $discount, '_edd_volume_discount_amount', true );
+				$amount  = ( $cart_amount * ( $percent / 100 ) ) * -1;
+				EDD()->fees->add_fee( $amount, get_the_title( $discount ), 'volume_discount' );
 			}
-
-			$percent = get_post_meta( $discount, '_edd_volume_discount_amount', true );
-			$amount  = ( $cart_amount * ( $percent / 100 ) ) * -1;
-			EDD()->fees->add_fee( $amount, get_the_title( $discount ), 'volume_discount' );
+		} else {
+			EDD()->fees->remove_fee( 'volume_discount' );
 		}
 
 	}
