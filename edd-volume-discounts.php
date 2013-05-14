@@ -201,7 +201,6 @@ class EDD_Volume_Discounts {
 	public function apply_discounts() {
 
 		$cart_count  = count( edd_get_cart_contents() );
-		$cart_amount = edd_get_cart_subtotal();
 
 		$discounts   = get_posts( array(
 			'post_type'      => 'edd_volume_discount',
@@ -224,13 +223,34 @@ class EDD_Volume_Discounts {
 				}
 
 				$percent = get_post_meta( $discount, '_edd_volume_discount_amount', true );
-				$amount  = ( $cart_amount * ( $percent / 100 ) ) * -1;
+				$amount  = $this->get_discount_amount( $percent );
 				EDD()->fees->add_fee( $amount, get_the_title( $discount ), 'volume_discount' );
 			}
 		} else {
 			EDD()->fees->remove_fee( 'volume_discount' );
 		}
 
+	}
+
+
+	/**
+	 * Get the discounted amount
+	 *
+	 * @since 1.1
+	 *
+	 * @access public
+	 * @return string
+	 */
+	private function get_discount_amount( $percentage ) {
+
+		$amount = edd_get_cart_subtotal();
+
+		if( edd_taxes_after_discounts() )
+			$amount += edd_get_cart_tax();
+
+		$amount  = ( $amount * ( $percentage / 100 ) ) * -1;
+
+		return number_format( $amount, 2 );
 	}
 
 
