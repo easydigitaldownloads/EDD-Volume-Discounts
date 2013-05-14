@@ -108,6 +108,7 @@ class EDD_Volume_Discounts {
 
 		// activate license key on settings save
 		add_action( 'admin_init', array( $this, 'activate_license' ) );
+		add_action( 'admin_init', array( $this, 'deactivate_license' ) );
 
 		// auto updater
 
@@ -326,6 +327,57 @@ class EDD_Volume_Discounts {
 
 		update_option( 'edd_volume_discounts_license_active', $license_data->license );
 
+	}
+
+
+	/**
+	 * Deactivate a license key
+	 *
+	 * @since  1.1.1
+	 * @return void
+	 */
+
+	public function deactivate_license() {
+		global $edd_options;
+
+		if ( ! isset( $_POST['edd_settings_general'] ) )
+			return;
+
+		if ( ! isset( $_POST['edd_settings_general']['edd_volume_discounts_license_key'] ) )
+			return;
+
+		// listen for our activate button to be clicked
+		if( isset( $_POST['edd_volume_discounts_license_key_deactivate'] ) ) {
+
+		    // run a quick security check
+		    if( ! check_admin_referer( 'edd_volume_discounts_license_key_nonce', 'edd_volume_discounts_license_key_nonce' ) )
+		      return; // get out if we didn't click the Activate button
+
+		    // retrieve the license from the database
+		    $license = trim( $edd_options['edd_volume_discounts_license_key'] );
+
+		    // data to send in our API request
+		    $api_params = array(
+		      'edd_action'=> 'deactivate_license',
+		      'license'   => $license,
+		      'item_name' => urlencode( EDD_VOLUME_DISCOUNTS_PRODUCT_NAME ) // the name of our product in EDD
+		    );
+
+		    // Call the custom API.
+		    $response = wp_remote_get( add_query_arg( $api_params, EDD_VOLUME_DISCOUNTS_STORE_API_URL ), array( 'timeout' => 15, 'sslverify' => false ) );
+
+		    // make sure the response came back okay
+		    if ( is_wp_error( $response ) )
+		    	return false;
+
+		    // decode the license data
+		    $license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		    // $license_data->license will be either "deactivated" or "failed"
+		    if( $license_data->license == 'deactivated' )
+		    	delete_option( 'edd_volume_discounts_license_active' );
+
+		}
 	}
 
 }
