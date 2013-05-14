@@ -70,8 +70,6 @@ class EDD_Volume_Discounts {
 
 			include dirname( __FILE__ ) . '/includes/admin.php';
 
-		} else {
-
 		}
 
 	}
