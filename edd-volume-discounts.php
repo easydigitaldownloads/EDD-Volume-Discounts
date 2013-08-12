@@ -45,11 +45,6 @@ class EDD_Volume_Discounts {
 		define( 'EDD_VOLUME_DISCOUNTS_PRODUCT_NAME', 'Volume Discounts' );
 		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.1.1' );
 
-		if( !class_exists( 'EDD_SL_Plugin_Updater' ) ) {
-			// load our custom updater
-			include( dirname( __FILE__ ) . '/EDD_SL_Plugin_Updater.php' );
-		}
-
 		$this->includes();
 		$this->init();
 
@@ -88,8 +83,6 @@ class EDD_Volume_Discounts {
 		if( ! class_exists( 'Easy_Digital_Downloads' ) )
 			return; // EDD not present
 
-		global $edd_options;
-
 		if( is_admin() ) {
 			$admin = new EDD_Volume_Discounts_Admin;
 		}
@@ -103,26 +96,12 @@ class EDD_Volume_Discounts {
 		// Apply discounts to the checkout
 		add_action( 'init', array( $this, 'apply_discounts' ) );
 
-		// register our license key settings
-		add_filter( 'edd_settings_general', array( $this, 'settings' ), 1 );
 
-		// activate license key on settings save
-		add_action( 'admin_init', array( $this, 'activate_license' ) );
-		add_action( 'admin_init', array( $this, 'deactivate_license' ) );
-
-		// auto updater
-
-		// retrieve our license key from the DB
-		$edd_volume_discounts_license_key = isset( $edd_options['edd_volume_discounts_license_key'] ) ? trim( $edd_options['edd_volume_discounts_license_key'] ) : '';
-
-		// setup the updater
-		$edd_updater = new EDD_SL_Plugin_Updater( EDD_VOLUME_DISCOUNTS_STORE_API_URL, __FILE__, array(
-				'version' 	=> EDD_VOLUME_DISCOUNTS_VERSION, 		// current version number
-				'license' 	=> $edd_volume_discounts_license_key, // license key (used get_option above to retrieve from DB)
-				'item_name' => EDD_VOLUME_DISCOUNTS_PRODUCT_NAME, // name of this plugin
-				'author' 	=> 'Pippin Williamson'  // author of this plugin
-			)
-		);
+		// Licenseing and updates
+		if( ! class_exists( 'EDD_License' ) ) {
+			include( dirname( __FILE__ ) . '/EDD_License_Handler.php' );
+		}
+		$license = new EDD_License( __FILE__, EDD_VOLUME_DISCOUNTS_PRODUCT_NAME, EDD_VOLUME_DISCOUNTS_VERSION, 'Pippin Williamson' );
 
 	}
 
@@ -252,132 +231,6 @@ class EDD_Volume_Discounts {
 		$amount  = ( $amount * ( $percentage / 100 ) ) * -1;
 
 		return number_format( $amount, 2 );
-	}
-
-
-	/**
-	 * Add our extension settings
-	 *
-	 * @since 1.0
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function settings( $settings ) {
-		$license_settings = array(
-			array(
-				'id' => 'edd_volume_discounts_license_header',
-				'name' => '<strong>' . __( 'Volume Discounts', 'edd-volume-discounts' ) . '</strong>',
-				'desc' => '',
-				'type' => 'header',
-				'size' => 'regular'
-			),
-			array(
-				'id' => 'edd_volume_discounts_license_key',
-				'name' => __( 'License Key', 'edd-volume-discounts' ),
-				'desc' => __( 'Enter your license for Volume Discounts to receive automatic upgrades', 'edd-volume-discounts' ),
-				'type'  => 'license_key',
-				'size'  => 'regular',
-				'options' => array( 'is_valid_license_option' => 'edd_volume_discounts_license_active' )
-			)
-		);
-
-		return array_merge( $settings, $license_settings );
-	}
-
-
-	/**
-	 * Activate a license key
-	 *
-	 * @since 1.0
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function activate_license() {
-
-		global $edd_options;
-
-		if( ! isset( $_POST['edd_settings_general'] ) )
-			return;
-		if( ! isset( $_POST['edd_settings_general']['edd_volume_discounts_license_key'] ) )
-			return;
-
-		if( get_option( 'edd_volume_discounts_license_active' ) == 'valid' )
-			return;
-
-		$license = sanitize_text_field( $_POST['edd_settings_general']['edd_volume_discounts_license_key'] );
-
-		// data to send in our API request
-		$api_params = array(
-			'edd_action'=> 'activate_license',
-			'license' 	=> $license,
-			'item_name' => urlencode( EDD_VOLUME_DISCOUNTS_PRODUCT_NAME ) // the name of our product in EDD
-		);
-
-		// Call the custom API.
-		$response = wp_remote_get( add_query_arg( $api_params, EDD_VOLUME_DISCOUNTS_STORE_API_URL ), array( 'timeout' => 15, 'body' => $api_params, 'sslverify' => false ) );
-
-		// make sure the response came back okay
-		if ( is_wp_error( $response ) )
-			return false;
-
-		// decode the license data
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-		update_option( 'edd_volume_discounts_license_active', $license_data->license );
-
-	}
-
-
-	/**
-	 * Deactivate a license key
-	 *
-	 * @since  1.1.1
-	 * @return void
-	 */
-
-	public function deactivate_license() {
-		global $edd_options;
-
-		if ( ! isset( $_POST['edd_settings_general'] ) )
-			return;
-
-		if ( ! isset( $_POST['edd_settings_general']['edd_volume_discounts_license_key'] ) )
-			return;
-
-		// listen for our activate button to be clicked
-		if( isset( $_POST['edd_volume_discounts_license_key_deactivate'] ) ) {
-
-		    // run a quick security check
-		    if( ! check_admin_referer( 'edd_volume_discounts_license_key_nonce', 'edd_volume_discounts_license_key_nonce' ) )
-		      return; // get out if we didn't click the Activate button
-
-		    // retrieve the license from the database
-		    $license = trim( $edd_options['edd_volume_discounts_license_key'] );
-
-		    // data to send in our API request
-		    $api_params = array(
-		      'edd_action'=> 'deactivate_license',
-		      'license'   => $license,
-		      'item_name' => urlencode( EDD_VOLUME_DISCOUNTS_PRODUCT_NAME ) // the name of our product in EDD
-		    );
-
-		    // Call the custom API.
-		    $response = wp_remote_get( add_query_arg( $api_params, EDD_VOLUME_DISCOUNTS_STORE_API_URL ), array( 'timeout' => 15, 'sslverify' => false ) );
-
-		    // make sure the response came back okay
-		    if ( is_wp_error( $response ) )
-		    	return false;
-
-		    // decode the license data
-		    $license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-		    // $license_data->license will be either "deactivated" or "failed"
-		    if( $license_data->license == 'deactivated' )
-		    	delete_option( 'edd_volume_discounts_license_active' );
-
-		}
 	}
 
 }
