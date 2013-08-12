@@ -180,7 +180,15 @@ class EDD_Volume_Discounts {
 	 */
 	public function apply_discounts() {
 
-		$cart_count  = count( edd_get_cart_contents() );
+		$cart_count  = 0;
+		$cart_items  = edd_get_cart_contents();
+
+		if( empty( $cart_items ) )
+			return;
+
+		foreach( $cart_items as $item ) {
+			$cart_count += $item['quantity'];
+		}
 
 		$discounts   = get_posts( array(
 			'post_type'      => 'edd_volume_discount',
