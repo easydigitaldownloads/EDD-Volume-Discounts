@@ -180,6 +180,8 @@ class EDD_Volume_Discounts {
 	 */
 	public function apply_discounts() {
 
+		global $wpdb;
+
 		$cart_count  = 0;
 		$cart_items  = edd_get_cart_contents();
 
@@ -190,30 +192,20 @@ class EDD_Volume_Discounts {
 			$cart_count += $item['quantity'];
 		}
 
-		$discounts   = get_posts( array(
-			'post_type'      => 'edd_volume_discount',
-			'posts_per_page' => '1',
-			'meta_key'       => '_edd_volume_discount_number',
-			'meta_compare'   => '<=',
-			'meta_value'     => $cart_count,
-			'orderby'        => 'meta_value_num',
-			'order'          => 'DESC',
-			'fields'         => 'ids'
-		) );
+		$discount = $wpdb->get_var( "SELECT post_id FROM $wpdb->postmeta WHERE $wpdb->postmeta.meta_value <= $cart_count AND $wpdb->postmeta.meta_key = '_edd_volume_discount_number' ORDER BY $wpdb->postmeta.meta_value+0 DESC LIMIT 1" );
 
-		if( $discounts ) {
-			foreach( $discounts as $discount ) {
+		if( $discount ) {
 
-				$number  = get_post_meta( $discount, '_edd_volume_discount_number', true );
-				if( $number > $cart_count ) {
-					EDD()->fees->remove_fee( 'volume_discount' );
-					return;
-				}
-
-				$percent = get_post_meta( $discount, '_edd_volume_discount_amount', true );
-				$amount  = $this->get_discount_amount( $percent );
-				EDD()->fees->add_fee( $amount, get_the_title( $discount ), 'volume_discount' );
+			$number  = get_post_meta( $discount, '_edd_volume_discount_number', true );
+			if( $number > $cart_count ) {
+				EDD()->fees->remove_fee( 'volume_discount' );
+				return;
 			}
+
+			$percent = get_post_meta( $discount, '_edd_volume_discount_amount', true );
+			$amount  = $this->get_discount_amount( $percent );
+			EDD()->fees->add_fee( $amount, get_the_title( $discount ), 'volume_discount' );
+			
 		} else {
 			EDD()->fees->remove_fee( 'volume_discount' );
 		}
