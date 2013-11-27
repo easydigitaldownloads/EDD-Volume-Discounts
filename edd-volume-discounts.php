@@ -192,7 +192,15 @@ class EDD_Volume_Discounts {
 			$cart_count += $item['quantity'];
 		}
 
-		$discount = $wpdb->get_var( "SELECT post_id FROM $wpdb->postmeta WHERE $wpdb->postmeta.meta_value <= $cart_count AND $wpdb->postmeta.meta_key = '_edd_volume_discount_number' ORDER BY $wpdb->postmeta.meta_value+0 DESC LIMIT 1" );
+		$discount = $wpdb->get_var(
+			"SELECT $wpdb->postmeta.post_id FROM $wpdb->posts, $wpdb->postmeta
+			 WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id
+			 AND $wpdb->posts.post_status = 'publish'
+			 AND $wpdb->postmeta.meta_value <= $cart_count
+			 AND $wpdb->postmeta.meta_key = '_edd_volume_discount_number'
+			 ORDER BY $wpdb->postmeta.meta_value+0
+			 DESC LIMIT 1"
+		);
 
 		if( $discount ) {
 
