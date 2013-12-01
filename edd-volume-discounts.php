@@ -182,6 +182,9 @@ class EDD_Volume_Discounts {
 
 		global $wpdb;
 
+		if( ! edd_is_checkout() )
+			return;
+
 		$cart_count  = 0;
 		$cart_items  = edd_get_cart_contents();
 
