@@ -82,7 +82,7 @@ class EDD_Volume_Discounts_Admin {
 	 * @since 1.0
 	 * @return void
 	 */
-	public function render_save_metabox() {
+	public static function render_save_metabox() {
 		global $post;
 ?>
 		<div><?php _e( 'If the conditions are met, this discount will be automatically applied at checkout.', 'edd-volume-discounts' ); ?></div>
@@ -100,7 +100,7 @@ class EDD_Volume_Discounts_Admin {
 	 * @since 1.0
 	 * @return void
 	 */
-	public function render_options_metabox() {
+	public static function render_options_metabox() {
 		global $post;
 
 		$number = get_post_meta( $post->ID, '_edd_volume_discount_number', true );
