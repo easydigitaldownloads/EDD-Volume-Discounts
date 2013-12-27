@@ -241,7 +241,7 @@ class EDD_Volume_Discounts {
 
 		$amount  = ( $amount * ( $percentage / 100 ) ) * -1;
 
-		return number_format( $amount, 2 );
+		return edd_sanitize_amount( $amount );
 	}
 
 }
