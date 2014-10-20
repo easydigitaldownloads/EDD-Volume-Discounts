@@ -235,12 +235,7 @@ class EDD_Volume_Discounts {
 	 */
 	private function get_discount_amount( $percentage ) {
 
-		$amount = edd_get_cart_subtotal();
-
-		if( edd_taxes_after_discounts() )
-			$amount += edd_get_cart_tax();
-
-		$amount  = ( $amount * ( $percentage / 100 ) ) * -1;
+		$amount  = ( edd_get_cart_subtotal() * ( $percentage / 100 ) ) * -1;
 
 		return edd_sanitize_amount( $amount );
 	}
