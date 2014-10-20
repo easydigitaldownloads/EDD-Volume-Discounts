@@ -98,10 +98,9 @@ class EDD_Volume_Discounts {
 
 
 		// Licenseing and updates
-		if( ! class_exists( 'EDD_License' ) ) {
-			include( dirname( __FILE__ ) . '/EDD_License_Handler.php' );
+		if( class_exists( 'EDD_License' ) ) {
+			$license = new EDD_License( __FILE__, EDD_VOLUME_DISCOUNTS_PRODUCT_NAME, EDD_VOLUME_DISCOUNTS_VERSION, 'Pippin Williamson' );
 		}
-		$license = new EDD_License( __FILE__, EDD_VOLUME_DISCOUNTS_PRODUCT_NAME, EDD_VOLUME_DISCOUNTS_VERSION, 'Pippin Williamson' );
 
 	}
 
