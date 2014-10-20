@@ -185,13 +185,15 @@ class EDD_Volume_Discounts {
 			return;
 
 		$cart_count  = 0;
-		$cart_items  = edd_get_cart_contents();
+		$cart_items  = edd_get_cart_content_details();
 
 		if( empty( $cart_items ) )
 			return;
 
 		foreach( $cart_items as $item ) {
-			$cart_count += $item['quantity'];
+			if( $item['item_price'] > 0 ) {
+				$cart_count += $item['quantity'];
+			}
 		}
 
 		$discount = $wpdb->get_var(
