@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - Volume Discounts
 Plugin URI: http://easydigitaldownloads.com/extension/volume-discounts
 Description: Provides the ability to create automatically applied discounts based on cart volume
-Version: 1.2.5
+Version: 1.3
 Author: Pippin Williamson
 Author URI:  http://pippinsplugins.com
 Contributors: mordauk
@@ -43,7 +43,7 @@ class EDD_Volume_Discounts {
 
 		define( 'EDD_VOLUME_DISCOUNTS_STORE_API_URL', 'https://easydigitaldownloads.com' );
 		define( 'EDD_VOLUME_DISCOUNTS_PRODUCT_NAME', 'Volume Discounts' );
-		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.2.5' );
+		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.3' );
 
 		$this->includes();
 		$this->init();
@@ -96,6 +96,10 @@ class EDD_Volume_Discounts {
 		// Apply discounts to the checkout
 		add_action( 'init', array( $this, 'apply_discounts' ) );
 
+		add_action( 'wp_head', array( $this, 'checkout_js' ) );
+
+		add_action( 'wp_ajax_edd_recalculate_volume_discounts', array( $this, 'recalculate_discounts' ) );
+		add_action( 'wp_ajax_nopriv_edd_recalculate_volume_discounts', array( $this, 'recalculate_discounts' ) );	
 
 		// Licenseing and updates
 		if( class_exists( 'EDD_License' ) ) {
@@ -181,9 +185,6 @@ class EDD_Volume_Discounts {
 
 		global $wpdb;
 
-		if( is_admin() )
-			return;
-
 		$cart_count  = 0;
 		$cart_items  = edd_get_cart_content_details();
 
@@ -224,6 +225,66 @@ class EDD_Volume_Discounts {
 
 	}
 
+	/**
+	 * JS to update checkout when quantity is updated
+	 *
+	 * @since 1.3
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function checkout_js() {
+?>		
+		<script type="text/javascript">
+		var edd_global_vars;
+		jQuery(document).ready(function($) {
+			$('body').on( 'edd_quantity_updated', function() {
+				$.ajax({
+					type: "POST",
+					data: {
+						action: 'edd_recalculate_volume_discounts'
+					},
+					dataType: "json",
+					url: edd_global_vars.ajaxurl,
+					xhrFields: {
+						withCredentials: true
+					},
+					success: function (response) {
+						$('#edd_checkout_cart_form').replaceWith(response.html);
+						$('.edd_cart_amount').html(response.total);
+					}
+				}).fail(function (data) {
+					if ( window.console && window.console.log ) {
+						console.log( data );
+					}
+				});				
+			});
+		});
+		</script>
+<?php
+	}
+
+	/**
+	 * Ajax callback to retrieve cart HTML
+	 *
+	 * @since 1.3
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function recalculate_discounts() {
+		ob_start();
+		edd_checkout_cart();
+		$cart = ob_get_clean();
+		$response = array(
+			'html'  => $cart,
+			'total' => html_entity_decode( edd_cart_total( false ), ENT_COMPAT, 'UTF-8' ),
+		);
+
+		echo json_encode( $response );
+
+		edd_die();
+	}
 
 	/**
 	 * Get the discounted amount
