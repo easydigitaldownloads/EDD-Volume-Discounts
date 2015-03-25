@@ -234,9 +234,11 @@ class EDD_Volume_Discounts {
 	 * @return void
 	 */
 	public function checkout_js() {
+		if( ! edd_is_checkout() ) {
+			return;
+		}
 ?>		
 		<script type="text/javascript">
-		var edd_global_vars;
 		jQuery(document).ready(function($) {
 			$('body').on( 'edd_quantity_updated', function() {
 				$.ajax({
@@ -245,7 +247,7 @@ class EDD_Volume_Discounts {
 						action: 'edd_recalculate_volume_discounts'
 					},
 					dataType: "json",
-					url: edd_global_vars.ajaxurl,
+					url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 					xhrFields: {
 						withCredentials: true
 					},
