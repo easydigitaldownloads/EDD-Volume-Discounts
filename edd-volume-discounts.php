@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - Volume Discounts
 Plugin URI: http://easydigitaldownloads.com/extension/volume-discounts
 Description: Provides the ability to create automatically applied discounts based on cart volume
-Version: 1.3
+Version: 1.3.1
 Author: Pippin Williamson
 Author URI:  http://pippinsplugins.com
 Contributors: mordauk
@@ -43,7 +43,7 @@ class EDD_Volume_Discounts {
 
 		define( 'EDD_VOLUME_DISCOUNTS_STORE_API_URL', 'https://easydigitaldownloads.com' );
 		define( 'EDD_VOLUME_DISCOUNTS_PRODUCT_NAME', 'Volume Discounts' );
-		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.3' );
+		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.3.1' );
 
 		$this->includes();
 		$this->init();
