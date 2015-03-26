@@ -213,11 +213,11 @@ class EDD_Volume_Discounts_Admin {
 		global $post, $post_ID;
 
 		$messages['edd_volume_discount'] = array(
-			1 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
-			4 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
-			6 => __( 'Volume Discount published.', 'edd-volume-discount' ),
-			7 => __( 'Volume Discount saved.', 'edd-volume-discount' ),
-			8 => __( 'Volume Discount submitted.', 'edd-volume-discount' )
+			1 => __( 'Volume Discount updated.', 'edd-volume-discounts' ),
+			4 => __( 'Volume Discount updated.', 'edd-volume-discounts' ),
+			6 => __( 'Volume Discount published.', 'edd-volume-discounts' ),
+			7 => __( 'Volume Discount saved.', 'edd-volume-discounts' ),
+			8 => __( 'Volume Discount submitted.', 'edd-volume-discounts' )
 		);
 
 		return $messages;
