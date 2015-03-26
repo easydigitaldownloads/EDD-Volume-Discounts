@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - Volume Discounts
 Plugin URI: http://easydigitaldownloads.com/extension/volume-discounts
 Description: Provides the ability to create automatically applied discounts based on cart volume
-Version: 1.3
+Version: 1.3.1
 Author: Pippin Williamson
 Author URI:  http://pippinsplugins.com
 Contributors: mordauk
@@ -27,8 +27,9 @@ class EDD_Volume_Discounts {
 	 */
 	public static function get_instance() {
 
-		if ( ! self::$instance )
+		if ( ! self::$instance ) {
 			self::$instance = new EDD_Volume_Discounts();
+		}
 
 		return self::$instance;
 	}
@@ -45,7 +46,7 @@ class EDD_Volume_Discounts {
 
 		define( 'EDD_VOLUME_DISCOUNTS_STORE_API_URL', 'https://easydigitaldownloads.com' );
 		define( 'EDD_VOLUME_DISCOUNTS_PRODUCT_NAME', 'Volume Discounts' );
-		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.3' );
+		define( 'EDD_VOLUME_DISCOUNTS_VERSION', '1.3.1' );
 
 		$this->includes();
 		$this->init();
@@ -82,8 +83,9 @@ class EDD_Volume_Discounts {
 	 */
 	private function init() {
 
-		if ( ! class_exists( 'Easy_Digital_Downloads' ) )
+		if ( ! class_exists( 'Easy_Digital_Downloads' ) ) {
 			return; // EDD not present
+		}
 
 		if ( is_admin() ) {
 			$admin = new EDD_Volume_Discounts_Admin;
@@ -143,31 +145,31 @@ class EDD_Volume_Discounts {
 
 		/** Payment Post Type */
 		$labels = array(
-			'name'			=> _x( 'Volume Discounts', 'post type general name', 'edd-volume-discounts' ),
-			'singular_name'	=> _x( 'Volume Discount', 'post type singular name', 'edd-volume-discounts' ),
-			'add_new'    		=> __( 'Add New', 'edd-volume-discounts' ),
-			'add_new_item'	=> __( 'Add New Volume Discount', 'edd-volume-discounts' ),
-			'edit_item'		=> __( 'Edit Volume Discount', 'edd-volume-discounts' ),
-			'new_item'		=> __( 'New Volume Discount', 'edd-volume-discounts' ),
-			'all_items'		=> __( 'Volume Discounts', 'edd-volume-discounts' ),
-			'view_item'		=> __( 'View Volume Discount', 'edd-volume-discounts' ),
-			'search_items'		=> __( 'Search Volume Discounts', 'edd-volume-discounts' ),
-			'not_found'		=> __( 'No Volume Discounts found', 'edd-volume-discounts' ),
+			'name' 			=> _x('Volume Discounts', 'post type general name', 'edd-volume-discounts' ),
+			'singular_name' 	=> _x('Volume Discount', 'post type singular name', 'edd-volume-discounts' ),
+			'add_new' 		=> __( 'Add New', 'edd-volume-discounts' ),
+			'add_new_item' 	=> __( 'Add New Volume Discount', 'edd-volume-discounts' ),
+			'edit_item' 		=> __( 'Edit Volume Discount', 'edd-volume-discounts' ),
+			'new_item' 		=> __( 'New Volume Discount', 'edd-volume-discounts' ),
+			'all_items' 		=> __( 'Volume Discounts', 'edd-volume-discounts' ),
+			'view_item' 		=> __( 'View Volume Discount', 'edd-volume-discounts' ),
+			'search_items' 		=> __( 'Search Volume Discounts', 'edd-volume-discounts' ),
+			'not_found' 		=> __( 'No Volume Discounts found', 'edd-volume-discounts' ),
 			'not_found_in_trash'	=> __( 'No Volume Discounts found in Trash', 'edd-volume-discounts' ),
-			'parent_item_colon'	=> '',
-			'menu_name'		=> __( 'Volume Discounts', 'edd-volume-discounts' )
+			'parent_item_colon' 	=> '',
+			'menu_name' 		=> __( 'Volume Discounts', 'edd-volume-discounts' )
 		);
 
 		$args = array(
-			'labels'			=> apply_filters( 'edd_volume_discounts_labels', $labels ),
-			'public'			=> false,
-			'show_ui'		=> true,
-			'show_in_menu'	=> 'edit.php?post_type=download',
-			'query_var'		=> false,
-			'rewrite'		=> false,
-			'capability_type'	=> 'shop_discount',
-			'map_meta_cap'	=> true,
-			'supports'		=> array( 'title' ),
+			'labels' 			=> apply_filters( 'edd_volume_discounts_labels', $labels ),
+			'public' 			=> false,
+			'show_ui' 		=> true,
+			'show_in_menu'     	 => 'edit.php?post_type=download',
+			'query_var' 		=> false,
+			'rewrite' 		=> false,
+			'capability_type' 	=> 'shop_discount',
+			'map_meta_cap'      	=> true,
+			'supports' 		=> array( 'title' ),
 			'can_export'		=> false,
 		);
 
@@ -190,8 +192,9 @@ class EDD_Volume_Discounts {
 		$cart_count  = 0;
 		$cart_items  = edd_get_cart_content_details();
 
-		if ( empty( $cart_items ) )
+		if ( empty( $cart_items ) ) {
 			return;
+		}
 
 		foreach ( $cart_items as $item ) {
 			if ( $item['item_price'] > 0 ) {
@@ -236,9 +239,11 @@ class EDD_Volume_Discounts {
 	 * @return void
 	 */
 	public function checkout_js() {
+		if ( ! edd_is_checkout() ) {
+			return;
+		}
 ?>
 		<script type="text/javascript">
-		var edd_global_vars;
 		jQuery(document).ready(function($) {
 			$('body').on( 'edd_quantity_updated', function() {
 				$.ajax({
@@ -247,7 +252,7 @@ class EDD_Volume_Discounts {
 						action: 'edd_recalculate_volume_discounts'
 					},
 					dataType: "json",
-					url: edd_global_vars.ajaxurl,
+					url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 					xhrFields: {
 						withCredentials: true
 					},
