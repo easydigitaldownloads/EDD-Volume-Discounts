@@ -1,0 +1,1 @@
+This plugin has been discontinued in favor of [Discounts Pro](https://easydigitaldownloads.com/downloads/discounts-pro/). If you purchased Volume Discounts, an upgrade option to Discounts Pro is available in your [account page](https://easydigitaldownloads.com/your-account).
