@@ -23,10 +23,10 @@ class EDD_Volume_Discounts_Admin {
 
 	function __construct() {
 
-		add_action( 'admin_head',       array( $this, 'css'                  ) );
-		add_action( 'add_meta_boxes',   array( $this, 'metaboxes'            ) );
-		add_action( 'admin_menu',       array( $this, 'metaboxes'            ) );
-		add_action( 'save_post',        array( $this, 'save_meta_box'        ) );
+		add_action( 'admin_head',       array( $this, 'css' ) );
+		add_action( 'add_meta_boxes',   array( $this, 'metaboxes' ) );
+		add_action( 'admin_menu',       array( $this, 'metaboxes' ) );
+		add_action( 'save_post',        array( $this, 'save_meta_box' ) );
 		add_filter( 'enter_title_here', array( $this, 'change_default_title' ) );
 		add_filter( 'post_updated_messages', array( $this, 'updated_messages' ) );
 		add_filter( 'manage_edit-edd_volume_discount_columns', array( $this, 'columns' ) );
@@ -155,7 +155,7 @@ class EDD_Volume_Discounts_Admin {
 		// The default fields that get saved
 		$fields = apply_filters( 'edd_volume_discounts_metabox_fields_save', array(
 				'_edd_volume_discount_number',
-				'_edd_volume_discount_amount'
+				'_edd_volume_discount_amount',
 			)
 		);
 
@@ -176,8 +176,9 @@ class EDD_Volume_Discounts_Admin {
 		}
 
 		// Force the discount to be marked as published
-		if( 'publish' !== get_post_status( $post->ID ) )
+		if ( 'publish' !== get_post_status( $post->ID ) ) {
 			wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ) );
+		}
 	}
 
 
@@ -191,7 +192,7 @@ class EDD_Volume_Discounts_Admin {
 
 		$screen = get_current_screen();
 
-		if( 'edd_volume_discount' == $screen->post_type ) {
+		if ( 'edd_volume_discount' == $screen->post_type ) {
 			$title = __( 'Enter discount title. This will be shown on checkout.', 'edd-volume-discounts' );
 		}
 
@@ -212,11 +213,11 @@ class EDD_Volume_Discounts_Admin {
 		global $post, $post_ID;
 
 		$messages['edd_volume_discount'] = array(
-			1 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
-			4 => __( 'Volume Discount updated.', 'edd-volume-discount' ),
-			6 => __( 'Volume Discount published.', 'edd-volume-discount' ),
-			7 => __( 'Volume Discount saved.', 'edd-volume-discount' ),
-			8 => __( 'Volume Discount submitted.', 'edd-volume-discount' )
+			1 => __( 'Volume Discount updated.', 'edd-volume-discounts' ),
+			4 => __( 'Volume Discount updated.', 'edd-volume-discounts' ),
+			6 => __( 'Volume Discount published.', 'edd-volume-discounts' ),
+			7 => __( 'Volume Discount saved.', 'edd-volume-discounts' ),
+			8 => __( 'Volume Discount submitted.', 'edd-volume-discounts' )
 		);
 
 		return $messages;
@@ -247,10 +248,11 @@ class EDD_Volume_Discounts_Admin {
 	 * @return void
 	 */
 	public function render_columns( $column_name, $post_id ) {
-		if ( 'edd_volume_discount' !== get_post_type( $post_id ) )
+		if ( 'edd_volume_discount' !== get_post_type( $post_id ) ) {
 			return;
+		}
 
-		switch( $column_name ) {
+		switch ( $column_name ) {
 
 			case 'number' :
 				echo absint( get_post_meta( $post_id, '_edd_volume_discount_number', true ) );
